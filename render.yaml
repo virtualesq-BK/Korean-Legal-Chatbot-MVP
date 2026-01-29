@@ -1,0 +1,28 @@
+# Render Blueprint: Backend API + Frontend Static Site
+# Docs: https://docs.render.com/blueprint-spec
+services:
+  # Backend API (FastAPI)
+  - type: web
+    name: legal-chatbot-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: LAW_GO_KR_OC
+        sync: false
+      - key: LAW_GO_KR_BASE
+        value: https://www.law.go.kr
+
+  # Frontend (React static site)
+  - type: web
+    name: legal-chatbot-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
