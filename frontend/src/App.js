@@ -77,9 +77,13 @@ function App() {
 
     } catch (error) {
       console.error('Error:', error);
+      const isNetworkError = error?.code === 'ERR_NETWORK' || error?.message?.includes('Network Error');
+      const text = isNetworkError
+        ? "⚠️ Could not reach the server. If running locally, start the backend (e.g. in backend/: uvicorn app:app --host 0.0.0.0 --port 8000)."
+        : "⚠️ Sorry, an error occurred while processing your request. Please try again.";
       const errorMessage = {
         id: messages.length + 2,
-        text: "⚠️ Sorry, an error occurred while processing your request. Please try again.",
+        text,
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString()
       };
