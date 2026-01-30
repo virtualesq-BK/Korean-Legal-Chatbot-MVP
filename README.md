@@ -174,8 +174,8 @@ git push -u origin main
 1. [render.com](https://render.com) 로그인 후 **New** → **Blueprint**.
 2. 이 저장소를 연결하고 **Apply**.
 3. 생성되는 서비스:
-   - **legal-chatbot-api**: 백엔드 (FastAPI, `backend/`)
-   - **legal-chatbot-frontend**: 프론트엔드 (React 정적 사이트, `frontend/`)
+   - **legal-chatbot-api**: 백엔드 (FastAPI, `backend/`) — **Runtime: Python 3** (Web Service)
+   - **legal-chatbot-frontend**: 프론트엔드 (React 정적 사이트, `frontend/`) — **Runtime: Static** (Static Site, 빌드 시 Node 사용)
 4. 환경 변수 입력:
    - **legal-chatbot-api**: `LAW_GO_KR_OC` (선택, 국가법령정보 API 사용 시 [open.law.go.kr](https://open.law.go.kr)에서 발급).
    - **legal-chatbot-frontend**: `REACT_APP_API_URL` — 백엔드 배포 후 나온 URL 입력 (예: `https://legal-chatbot-api.onrender.com`). 끝에 `/` 없이 입력.
@@ -203,10 +203,14 @@ git push -u origin main
 
 ### 요약
 
-| 서비스 | Root Directory | 결과 URL 예시 |
-|--------|----------------|----------------|
-| 백엔드 (Web Service) | `backend` | `https://legal-chatbot-api.onrender.com` |
-| 프론트엔드 (Static Site) | `frontend` | `https://legal-chatbot-frontend.onrender.com` |
+| 서비스 | Root Directory | Runtime (Language) | 결과 URL 예시 |
+|--------|----------------|-------------------|----------------|
+| 백엔드 (Web Service) | `backend` | **Python 3** | `https://legal-chatbot-api.onrender.com` |
+| 프론트엔드 (Static Site) | `frontend` | **Static** (빌드만 Node) | `https://legal-chatbot-frontend.onrender.com` |
+
+**Blueprint 배포 시 Language(Runtime) 선택:**  
+- **백엔드(legal-chatbot-api)**: **Python 3** — Web Service이고 `render.yaml`에 `runtime: python`으로 되어 있음. Docker 아님.  
+- **프론트엔드(legal-chatbot-frontend)**: **Static** — Static Site이고 `runtime: static`. 빌드 시에만 Node(npm)가 사용되고, 서비스 자체는 정적 파일 호스팅.
 
 - 프론트엔드의 **Environment**에 `REACT_APP_API_URL`을 백엔드 URL로 설정해야 챗봇이 API를 호출합니다.
 - 백엔드는 CORS로 모든 오리진을 허용하므로, Render 프론트엔드 도메인에서 바로 호출 가능합니다.
