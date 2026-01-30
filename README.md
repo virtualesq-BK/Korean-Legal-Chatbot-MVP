@@ -211,6 +211,14 @@ git push -u origin main
 - 프론트엔드의 **Environment**에 `REACT_APP_API_URL`을 백엔드 URL로 설정해야 챗봇이 API를 호출합니다.
 - 백엔드는 CORS로 모든 오리진을 허용하므로, Render 프론트엔드 도메인에서 바로 호출 가능합니다.
 
+**Render 프론트엔드에서 "Could not reach the API"가 나올 때**
+
+1. **백엔드 URL 확인**: Render 대시보드에서 **legal-chatbot-api** 서비스 → 상단 URL 복사 (예: `https://legal-chatbot-api.onrender.com`, 끝에 `/` 없이).
+2. **프론트엔드 환경 변수 설정**: **legal-chatbot-frontend** 서비스 → **Environment** → **Add Environment Variable**  
+   - Key: `REACT_APP_API_URL`  
+   - Value: 위에서 복사한 백엔드 URL
+3. **재배포**: 환경 변수는 **빌드 시** 적용되므로, 저장 후 **Manual Deploy** → **Deploy latest commit** 으로 프론트엔드를 다시 빌드·배포해야 합니다.
+
 ## ⚠️ Disclaimer
 
 This chatbot is for **informational purposes only**. It does not replace legal advice. 

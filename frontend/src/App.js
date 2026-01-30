@@ -78,9 +78,13 @@ function App() {
     } catch (error) {
       console.error('Error:', error);
       const isNetworkError = error?.code === 'ERR_NETWORK' || error?.message?.includes('Network Error');
-      const text = isNetworkError
-        ? "⚠️ Could not reach the server. If running locally, start the backend (e.g. in backend/: uvicorn app:app --host 0.0.0.0 --port 8000)."
-        : "⚠️ Sorry, an error occurred while processing your request. Please try again.";
+      const isLocalhost = typeof window !== 'undefined' && /localhost|127\.0\.0\.1/.test(window.location?.hostname || '');
+      let text = "⚠️ Sorry, an error occurred while processing your request. Please try again.";
+      if (isNetworkError) {
+        text = isLocalhost
+          ? "⚠️ Could not reach the server. Start the backend (e.g. in backend/: uvicorn app:app --host 0.0.0.0 --port 8000)."
+          : "⚠️ Could not reach the API. On Render: set REACT_APP_API_URL to your backend URL in the frontend service Environment, then redeploy.";
+      }
       const errorMessage = {
         id: messages.length + 2,
         text,
