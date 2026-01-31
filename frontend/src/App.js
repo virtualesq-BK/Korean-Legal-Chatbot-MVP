@@ -124,7 +124,7 @@ function App() {
       <header className="app-header">
         <div className="header-main">
           <h1>
-            <img src="/BK.jpg" alt="" className="header-logo" />
+            <img src="/상담 변호사.jpg" alt="" className="header-logo" />
             Korean Legal Assistant
           </h1>
           <p className="subtitle">Comprehensive Legal Guide for Foreign Businesses in Korea</p>
@@ -190,7 +190,7 @@ function App() {
           {messages.map((msg) => (
             <div key={msg.id} className={`message ${msg.sender}`}>
               {msg.sender === 'user' && (
-                <img src="/BK.jpg" alt="" className="message-avatar" />
+                <img src="/상담 변호사.jpg" alt="" className="message-avatar" />
               )}
               <div className="message-bubble">
                 <div className="message-text">{msg.text}</div>
