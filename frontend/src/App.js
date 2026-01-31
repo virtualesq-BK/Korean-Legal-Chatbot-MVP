@@ -157,10 +157,8 @@ function App() {
 
       <div className="welcome-section">
         👋 Hello! I'm your guide to the legal landscape for foreign businesses in Korea.
-        <br /><br />
-        I cover: (1) Foreign Investment & Government Incentives (2) Digital Platform & AI Regulations (3) Labor & Employment (4) Technology Security & IP (5) Supply Chain & ESG Due Diligence (6) Corporate Setup, Tax, Fair Trade, Data Privacy & Dispute Resolution.
-        <br /><br />
-        Select your country above and ask anything.
+        <br />
+        Select your country above and ask anything about Korean law.
       </div>
 
       <div className="quick-questions-section">
