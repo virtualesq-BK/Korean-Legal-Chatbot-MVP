@@ -11,6 +11,8 @@ services:
     startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
       - key: LAW_GO_KR_OC
         sync: false
       - key: LAW_GO_KR_BASE

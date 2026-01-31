@@ -223,6 +223,13 @@ git push -u origin main
    - Value: 위에서 복사한 백엔드 URL
 3. **재배포**: 환경 변수는 **빌드 시** 적용되므로, 저장 후 **Manual Deploy** → **Deploy latest commit** 으로 프론트엔드를 다시 빌드·배포해야 합니다.
 
+**Render 프론트엔드에서 답변이 안 나올 때 / 요청이 "pending"일 때**
+
+- **Status가 "pending"**이면 요청이 백엔드로 갔지만, **백엔드가 아직 깨어나지 않은 상태**입니다. Render **무료 플랜**은 15분 정도 미사용 시 서비스를 슬립시키고, 첫 요청 시 **콜드 스타트**(30초~1분, 가끔 더 걸림)가 필요합니다.
+- **대처:** 그대로 **최대 1분 정도 기다리면** 대부분 응답이 옵니다. 타임아웃(60초) 후 에러가 나오면 **한 번 더** 같은 질문을 보내 보세요. 두 번째부터는 빠릅니다.
+- 백엔드가 깨어난 뒤에는 같은 세션에서의 요청은 정상 속도로 처리됩니다.
+- (선택) 백엔드를 자주 깨워 두고 싶다면: [cron-job.org](https://cron-job.org) 등에서 10~15분마다 `GET https://legal-chatbot-api-f2vc.onrender.com/health` 를 호출하도록 예약하면 슬립을 줄일 수 있습니다.
+
 ## ⚠️ Disclaimer
 
 This chatbot is for **informational purposes only**. It does not replace legal advice. 

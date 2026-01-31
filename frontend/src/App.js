@@ -13,14 +13,7 @@ function App() {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
-    setMessages([
-      {
-        id: 1,
-        text: "👋 Hello! I'm your guide to the legal landscape for foreign businesses in Korea.\n\nI cover: (1) Foreign Investment & Government Incentives (2) Digital Platform & AI Regulations (3) Labor & Employment (4) Technology Security & IP (5) Supply Chain & ESG Due Diligence (6) Corporate Setup, Tax, Fair Trade, Data Privacy & Dispute Resolution.\n\nSelect your country above and ask anything.",
-        sender: 'bot',
-        timestamp: new Date().toLocaleTimeString()
-      }
-    ]);
+    setMessages([]);
   }, []);
 
   const scrollToBottom = () => {
@@ -45,53 +38,63 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/chat`, {
-        message: input,
-        country: country,
-        user_type: userType
-      });
+      const response = await axios.post(
+        `${API_URL}/chat`,
+        {
+          message: input,
+          country: country,
+          user_type: userType
+        },
+        { timeout: 60000 }
+      );
 
-      const botResponse = {
-        id: messages.length + 2,
-        text: response.data.reply,
+      const replyText = response.data?.reply ?? "No response from the server.";
+      const botPayload = {
+        text: replyText,
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString(),
-        confidence: response.data.confidence,
-        needsExpert: response.data.needs_expert,
-        suggestedActions: response.data.suggested_actions,
-        lawReferences: response.data.law_references || []
+        confidence: response.data?.confidence,
+        needsExpert: response.data?.needs_expert,
+        suggestedActions: response.data?.suggested_actions || [],
+        lawReferences: response.data?.law_references || []
       };
+      const expertPayload = response.data?.needs_expert
+        ? {
+            text: `⚖️ It seems you need expert consultation. Would you like to connect with a ${response.data?.suggested_expert_type ?? 'legal'} specialist?`,
+            sender: 'bot',
+            timestamp: new Date().toLocaleTimeString(),
+            isExpertSuggestion: true
+          }
+        : null;
 
-      setMessages(prev => [...prev, botResponse]);
-
-      if (response.data.needs_expert) {
-        const expertMessage = {
-          id: messages.length + 3,
-          text: `⚖️ It seems you need expert consultation. Would you like to connect with a ${response.data.suggested_expert_type} specialist?`,
-          sender: 'bot',
-          timestamp: new Date().toLocaleTimeString(),
-          isExpertSuggestion: true
-        };
-        setMessages(prev => [...prev, expertMessage]);
-      }
+      setMessages(prev => {
+        const next = [...prev, { ...botPayload, id: prev.length + 1 }];
+        if (expertPayload) next.push({ ...expertPayload, id: prev.length + 2 });
+        return next;
+      });
 
     } catch (error) {
       console.error('Error:', error);
       const isNetworkError = error?.code === 'ERR_NETWORK' || error?.message?.includes('Network Error');
+      const isTimeout = error?.code === 'ECONNABORTED' || error?.message?.includes('timeout');
       const isLocalhost = typeof window !== 'undefined' && /localhost|127\.0\.0\.1/.test(window.location?.hostname || '');
+      const serverDetail = error?.response?.data?.detail;
       let text = "⚠️ Sorry, an error occurred while processing your request. Please try again.";
-      if (isNetworkError) {
+      if (typeof serverDetail === 'string') {
+        text = `⚠️ ${serverDetail}`;
+      } else if (isTimeout) {
+        text = "⚠️ Request timed out. On Render free tier the backend may be waking up (cold start). Please try again in a few seconds.";
+      } else if (isNetworkError) {
         text = isLocalhost
           ? "⚠️ Could not reach the server. Start the backend (e.g. in backend/: uvicorn app:app --host 0.0.0.0 --port 8000)."
-          : "⚠️ Could not reach the API. On Render: set REACT_APP_API_URL to your backend URL in the frontend service Environment, then redeploy.";
+          : "⚠️ Could not reach the API. Check REACT_APP_API_URL in the frontend Environment and redeploy, or the backend may be starting up—try again shortly.";
       }
-      const errorMessage = {
-        id: messages.length + 2,
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
         text,
         sender: 'bot',
         timestamp: new Date().toLocaleTimeString()
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -151,6 +154,14 @@ function App() {
           ⚠️ <strong>Important Notice:</strong> This chatbot is for informational purposes only. It does not replace legal advice. Please consult with a qualified attorney before making any important decisions.
         </div>
       </header>
+
+      <div className="welcome-section">
+        👋 Hello! I'm your guide to the legal landscape for foreign businesses in Korea.
+        <br /><br />
+        I cover: (1) Foreign Investment & Government Incentives (2) Digital Platform & AI Regulations (3) Labor & Employment (4) Technology Security & IP (5) Supply Chain & ESG Due Diligence (6) Corporate Setup, Tax, Fair Trade, Data Privacy & Dispute Resolution.
+        <br /><br />
+        Select your country above and ask anything.
+      </div>
 
       <div className="quick-questions-section">
         <label htmlFor="quick-questions-select" className="quick-questions-label">Quick Questions:</label>
@@ -227,6 +238,7 @@ function App() {
                   <span></span>
                   <span></span>
                 </div>
+                <div className="typing-hint">Waiting for response (up to 1 min on first request)…</div>
               </div>
             </div>
           )}
